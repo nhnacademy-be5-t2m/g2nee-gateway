@@ -6,15 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RouteLocaterConfig {
+public class RouteLocatorConfig {
     @Bean
     public RouteLocator shopRoute(RouteLocatorBuilder builder) {
         return builder.routes()
                 //hello 요청이 오면 lb(load balancing) //g2nee-shop으로 로드벨런싱
                 //기본값 50:50
                 .route("g2nee-shop",
-                        p -> p.path("/hello").and()
-                                .uri("lb://G2NEE-SHOP")
+                        p -> p.path("/shop/**").and()
+                                .uri("lb://G2NEE-SHOP/")
                 )
                 .build();
     }
