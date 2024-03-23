@@ -18,4 +18,14 @@ public class RouteLocatorConfig {
                 )
                 .build();
     }
+
+    @Bean
+    public RouteLocator authRoute(RouteLocatorBuilder builder){
+        return builder.routes()
+                .route("g2nee-auth",
+                        p -> p.path("/auth/**").and()
+                                .uri("lb://G2NEE-AUTH")
+                        )
+                .build();
+    }
 }
