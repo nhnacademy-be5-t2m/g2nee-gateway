@@ -14,7 +14,6 @@ public class RouteLocatorConfig {
                 //기본값 50:50
                 .route("g2nee-shop",
                         p -> p.path("/shop/**")
-                                .filters(f -> f.rewritePath("/shop/(?<segment>.*)", "/${segment}"))
                                 .uri("lb://G2NEE-SHOP/")
                 )
                 .build();
