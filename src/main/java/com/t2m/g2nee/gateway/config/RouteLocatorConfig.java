@@ -13,7 +13,8 @@ public class RouteLocatorConfig {
                 //hello 요청이 오면 lb(load balancing) //g2nee-shop으로 로드벨런싱
                 //기본값 50:50
                 .route("g2nee-shop",
-                        p -> p.path("/shop/**").and()
+                        p -> p.path("/shop/**")
+                                .filters(f -> f.rewritePath("/shop/(?<segment>.*)", "/${segment}"))
                                 .uri("lb://G2NEE-SHOP/")
                 )
                 .build();
