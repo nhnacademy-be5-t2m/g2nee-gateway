@@ -13,7 +13,7 @@ public class RouteLocatorConfig {
                 //hello 요청이 오면 lb(load balancing) //g2nee-shop으로 로드벨런싱
                 //기본값 50:50
                 .route("g2nee-shop",
-                        p -> p.path("/api/**/shop/**")
+                        p -> p.path("/api/*/shop/**")
                                 .uri("lb://G2NEE-SHOP/")
                 )
                 .build();
@@ -23,7 +23,7 @@ public class RouteLocatorConfig {
     public RouteLocator authRoute(RouteLocatorBuilder builder){
         return builder.routes()
                 .route("g2nee-auth",
-                        p -> p.path("/api/**/auth/**").and()
+                        p -> p.path("/api/*/auth/**").and()
                                 .uri("http://G2NEE-AUTH")
                         )
                 .build();
