@@ -24,7 +24,7 @@ public class RouteLocatorConfig {
         return builder.routes()
                 .route("g2nee-auth",
                         p -> p.path("/api/*/auth/**")
-                                .uri("http://G2NEE-AUTH:8080/")
+                                .uri("lb://G2NEE-AUTH/")
                         )
                 .build();
     }
