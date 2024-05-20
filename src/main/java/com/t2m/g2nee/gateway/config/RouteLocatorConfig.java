@@ -2,9 +2,12 @@ package com.t2m.g2nee.gateway.config;
 
 import com.t2m.g2nee.gateway.filter.AuthorizationFilter;
 import com.t2m.g2nee.gateway.util.JWTUtil;
+import java.util.function.Function;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,8 +24,7 @@ public class RouteLocatorConfig {
                 //기본값 50:50
                 .route("g2nee-shop",
                         p -> p.path("/api/*/shop/**")
-                                .filters(f -> f.rewritePath("/api/*/shop/(?<segment>.*)", "/${segment}")
-                                        .filter(tokenFilter(authorizationFilter, redisTemplate, jwtUtil)))
+                                .filters(tokenFilter(authorizationFilter, redisTemplate, jwtUtil))
                                 .uri("lb://G2NEE-SHOP/"))
                 .build();
     }
@@ -37,10 +39,14 @@ public class RouteLocatorConfig {
                 .build();
     }
 
-    private GatewayFilter tokenFilter(AuthorizationFilter authorizationFilter,
-                                      RedisTemplate<String, String> redisTemplate,
-                                      JWTUtil jwtUtil) {
-        return authorizationFilter.apply(
-                new AuthorizationFilter.Config(redisTemplate, jwtUtil));
+    private Function<GatewayFilterSpec, UriSpec> tokenFilter(AuthorizationFilter filter,
+                                                             RedisTemplate<String, String> redisTemplate,
+                                                             JWTUtil jwtUtils) {
+        return f -> f.filter(
+                filter.apply(
+                        new AuthorizationFilter.Config(redisTemplate, jwtUtils)
+                )
+        );
+
     }
 }
