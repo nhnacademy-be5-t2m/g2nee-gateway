@@ -1,13 +1,17 @@
 package com.t2m.g2nee.gateway.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.t2m.g2nee.gateway.errorCode.ErrorResponse;
 import com.t2m.g2nee.gateway.util.JWTUtil;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -20,11 +24,13 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     private static final String CHECK_TOKEN = "Authorization";
     private static final String TOKEN_EXPIRED_MESSAGE = "토큰이 만료되었습니다.";
     private static final String TOKEN_INVALID_MESSAGE = "유효하지않은 토큰입니다";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @RequiredArgsConstructor
     public static class Config {
         private final RedisTemplate<String, String> redisTemplate;
         private final JWTUtil jwtUtils;
+
     }
 
     /**
@@ -98,7 +104,16 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     private Mono<Void> makeResponse(ServerWebExchange exchange, String message) {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        return response.setComplete();
+        ErrorResponse errorResponse = new ErrorResponse(401,message);
+
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(errorResponse);
+            DataBuffer dataBuffer = response.bufferFactory().wrap(bytes);
+            return response.writeWith(Mono.just(dataBuffer));
+        } catch (Exception e) {
+            return response.setComplete();
+        }
     }
 }
