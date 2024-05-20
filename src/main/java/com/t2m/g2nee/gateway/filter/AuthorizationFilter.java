@@ -42,6 +42,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
             if (!checkHeaderAccessToken(request)) {
                 String accessToken = Objects.requireNonNull(request.getHeaders()
                         .get(CHECK_TOKEN)).get(0).substring(7);
+                log.info("현재 AccessToken: "+accessToken);
 
                 //whiteList에 있는 accessToken인지 확인
                 if (!checkWhiteList(config, accessToken)) {
@@ -55,6 +56,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                 }
 
             }
+            log.info("accessToken 통과");
             return chain.filter(exchange);
         });
     }
