@@ -39,6 +39,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         return ((exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
 
+            log.info("현재 request: "+request);
             if (!checkHeaderAccessToken(request)) {
                 String accessToken = Objects.requireNonNull(request.getHeaders()
                         .get(CHECK_TOKEN)).get(0).substring(7);
