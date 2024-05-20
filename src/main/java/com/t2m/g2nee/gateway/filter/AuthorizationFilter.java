@@ -45,10 +45,12 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
 
                 //whiteList에 있는 accessToken인지 확인
                 if (!checkWhiteList(config, accessToken)) {
+                    log.info("whiteList에 있는 token과 일치하지않습니다.");
                     return makeResponse(exchange, TOKEN_INVALID_MESSAGE);
                 }
 
                 if (!config.jwtUtils.isValidateToken(accessToken)) {
+                    log.info("만료기간이 지난 token입니다.");
                     return makeResponse(exchange, TOKEN_EXPIRED_MESSAGE);
                 }
 
